@@ -28,7 +28,12 @@ def read_root():
 
 # Loading the trained Logistic Regression Pipeline
 # (This includes both the StandardScaler and the Model)
-model_pipeline = joblib.load('personality_pipeline.pkl')
+import os
+import joblib
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "personality_pipeline.pkl")
+model_pipeline = joblib.load(MODEL_PATH)
+
 
 
 # Define the Input Data Schema using Pydantic
