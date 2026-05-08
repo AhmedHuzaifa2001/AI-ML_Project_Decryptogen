@@ -87,7 +87,7 @@
 
         try {
             // Send the data to your local FastAPI server
-            const response = await fetch("https://personality-predictor-api-4z9a.onrender.com/predict", {
+            const response = await fetch("/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(requestData)

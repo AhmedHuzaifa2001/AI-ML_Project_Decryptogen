@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import joblib
 import pandas as pd
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 # FastAPI app
 app = FastAPI(
@@ -20,17 +22,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve the frontend HTML page at the root URL
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Personality Predictor API. Send a POST request to /predict."}
+    html_path = os.path.join(os.path.dirname(__file__), "index.html")
+    return FileResponse(html_path)
 
 
 
 # Loading the trained Logistic Regression Pipeline
 # (This includes both the StandardScaler and the Model)
-import os
-import joblib
-
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "personality_pipeline.pkl")
 model_pipeline = joblib.load(MODEL_PATH)
 
