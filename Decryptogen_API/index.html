@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Predictor AI</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        h2 { text-align: center; color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        button:hover { background-color: #2980b9; }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; display: none; }
+        .extrovert { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .introvert { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🧠 AI Personality Predictor</h2>
+    <p style="text-align: center; color: #666;">Answer these 7 questions to discover your personality type.</p>
+    
+    <form id="predictionForm">
+        <div class="form-group">
+            <label>Hours spent alone per week:</label>
+            <input type="number" id="alone" required min="0" step="0.1">
+        </div>
+        <div class="form-group">
+            <label>Do you have stage fear?</label>
+            <select id="stage_fear" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Social events attended (monthly):</label>
+            <input type="number" id="events" required min="0" step="0.1">
+        </div>
+        <div class="form-group">
+            <label>Hours spent outside per week:</label>
+            <input type="number" id="outside" required min="0" step="0.1">
+        </div>
+        <div class="form-group">
+            <label>Do you feel drained after socializing?</label>
+            <select id="drained" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Size of friend circle:</label>
+            <input type="number" id="friends" required min="0" step="0.1">
+        </div>
+        <div class="form-group">
+            <label>Social media posts per week:</label>
+            <input type="number" id="posts" required min="0" step="0.1">
+        </div>
+
+        <button type="submit" id="submitBtn">Analyze Personality</button>
+    </form>
+
+    <div id="result" class="result-box"></div>
+</div>
+
+<script>
+    document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+        event.preventDefault(); // Prevent page reload
+        
+        const btn = document.getElementById("submitBtn");
+        btn.innerText = "Analyzing...";
+        btn.disabled = true;
+
+        // Gather the data from the form
+        const requestData = {
+            Time_spent_Alone: parseFloat(document.getElementById("alone").value),
+            Stage_fear: document.getElementById("stage_fear").value,
+            Social_event_attendance: parseFloat(document.getElementById("events").value),
+            Going_outside: parseFloat(document.getElementById("outside").value),
+            Drained_after_socializing: document.getElementById("drained").value,
+            Friends_circle_size: parseFloat(document.getElementById("friends").value),
+            Post_frequency: parseFloat(document.getElementById("posts").value)
+        };
+
+        try {
+            // Send the data to your local FastAPI server
+            const response = await fetch("http://127.0.0.1:8000/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestData)
+            });
+
+            const data = await response.json();
+            
+            // Display the result
+            const resultBox = document.getElementById("result");
+            resultBox.style.display = "block";
+            
+            if (data.prediction === "Extrovert") {
+                resultBox.className = "result-box extrovert";
+                resultBox.innerHTML = `🎉 The AI predicts you are an <b>EXTROVERT</b>!`;
+            } else {
+                resultBox.className = "result-box introvert";
+                resultBox.innerHTML = `📚 The AI predicts you are an <b>INTROVERT</b>!`;
+            }
+
+        } catch (error) {
+            alert("Error connecting to the API. Is your FastAPI server running?");
+        } finally {
+            btn.innerText = "Analyze Personality";
+            btn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
